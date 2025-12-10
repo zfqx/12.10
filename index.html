@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神木e建通 - 首页</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入图标库 -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        /* 自定义动画效果 */
+        .card-hover {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(0);
+        }
+        .card-hover:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.25), 0 15px 15px -5px rgba(0, 0, 0, 0.1);
+        }
+        .nav-scroll {
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        /* 模态框动画 */
+        .modal-fade {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-slide {
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        /* 模块数字标记 */
+        .module-badge {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: white;
+            color: #333;
+            font-weight: 900;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 8px -2px rgba(0, 0, 0, 0.25);
+            border: 4px solid white;
+            z-index: 10;
+        }
+        /* 渐变背景 */
+        .card-gradient-blue {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+        .card-gradient-teal {
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+        }
+        .card-gradient-orange {
+            background: linear-gradient(135deg, #ea580c, #f97316);
+        }
+        .card-gradient-purple {
+            background: linear-gradient(135deg, #9333ea, #a855f7);
+        }
+        .card-gradient-red {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+        .card-gradient-indigo {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <!-- 导航栏 -->
+    <header class="nav-scroll fixed w-full top-0 z-50 bg-white shadow-md">
+        <div class="container mx-auto px-5 py-4 flex justify-between items-center">
+            <!-- 平台Logo -->
+            <a href="index.html" class="flex items-center gap-3">
+                <i class="fa fa-home text-red-600 text-3xl"></i>
+                <span class="text-2xl md:text-3xl font-black text-red-700">神木e建通</span>
+            </a>
+
+            <!-- 桌面端导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="index.html" class="font-bold text-red-700 border-b-4 border-red-700 py-2 text-xl">首页</a>
+                <a href="gallery.html" class="font-bold text-gray-600 hover:text-red-700 transition-colors text-xl">神木图库</a>
+                <a href="craftsmen.html" class="font-bold text-gray-600 hover:text-red-700 transition-colors text-xl">匠心传承</a>
+                <a href="building.html" class="font-bold text-gray-600 hover:text-red-700 transition-colors text-xl">乡韵筑造</a>
+                <a href="feedback.html" class="font-bold text-gray-600 hover:text-red-700 transition-colors text-xl">意见征集</a>
+                <a href="mall.html" class="font-bold text-gray-600 hover:text-red-700 transition-colors text-xl">积分商城</a>
+                <!-- 登录/用户信息区域 -->
+                <div class="flex items-center gap-5">
+                    <!-- 未登录状态 -->
+                    <button id="loginBtn" class="hidden font-bold text-gray-600 hover:text-red-700 transition-colors flex items-center gap-2 text-xl">
+                        <i class="fa fa-user-o text-2xl"></i> 登录
+                    </button>
+                    <!-- 已登录状态 -->
+                    <div id="userInfo" class="hidden flex items-center gap-3">
+                        <img src="https://picsum.photos/id/64/50/50" alt="用户头像" class="w-12 h-12 rounded-full object-cover border-3 border-red-100">
+                        <span class="font-bold text-gray-700 text-xl" id="userName">游客</span>
+                        <button id="logoutBtn" class="text-red-500 hover:text-red-700 transition-colors text-2xl">
+                            <i class="fa fa-sign-out"></i>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- 移动端汉堡菜单 + 登录按钮 -->
+            <div class="md:hidden flex items-center gap-5">
+                <button id="mobileLoginBtn" class="text-gray-600">
+                    <i class="fa fa-user-o text-3xl"></i>
+                </button>
+                <button id="menuBtn" class="text-gray-600 text-3xl">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 移动端导航菜单（默认隐藏） -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white shadow-lg border-t border-gray-200">
+            <div class="container mx-auto px-5 py-4 flex flex-col gap-5">
+                <a href="index.html" class="font-bold text-red-700 py-4 border-b-2 border-red-100 text-2xl">首页</a>
+                <a href="gallery.html" class="font-bold text-gray-600 py-4 border-b-2 border-red-100 hover:text-red-700 text-2xl">神木图库</a>
+                <a href="craftsmen.html" class="font-bold text-gray-600 py-4 border-b-2 border-red-100 hover:text-red-700 text-2xl">匠心传承</a>
+                <a href="building.html" class="font-bold text-gray-600 py-4 border-b-2 border-red-100 hover:text-red-700 text-2xl">乡韵筑造</a>
+                <a href="feedback.html" class="font-bold text-gray-600 py-4 border-b-2 border-red-100 hover:text-red-700 text-2xl">意见征集</a>
+                <a href="mall.html" class="font-bold text-gray-600 py-4 border-b-2 border-red-100 hover:text-red-700 text-2xl">积分商城</a>
+                <!-- 移动端用户信息 -->
+                <div id="mobileUserInfo" class="hidden py-4 border-b-2 border-red-100 flex items-center gap-4">
+                    <img src="https://picsum.photos/id/64/60/60" alt="用户头像" class="w-14 h-14 rounded-full object-cover border-3 border-red-100">
+                    <div>
+                        <p class="font-bold text-gray-700 text-2xl" id="mobileUserName">游客</p>
+                        <p class="text-base text-gray-500" id="mobileUserRole">普通用户</p>
+                    </div>
+                    <button id="mobileLogoutBtn" class="ml-auto text-red-500 text-2xl">
+                        <i class="fa fa-sign-out"></i> 退出
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区 -->
+    <section class="pt-40 pb-28 bg-gradient-to-b from-red-50 to-white">
+        <div class="container mx-auto px-5 text-center">
+            <h1 class="text-[clamp(2.8rem,8vw,4.5rem)] font-black text-gray-800 leading-tight mb-8">
+                神木民居建筑选型与文化传承平台
+            </h1>
+            <p class="text-2xl md:text-3xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+                为村民提供专业的民居建筑方案，传承传统工艺，让神木建筑文化焕发新生
+            </p>
+            <a href="#core-modules" class="inline-flex items-center gap-3 bg-red-700 text-white px-10 py-5 rounded-full text-2xl font-bold hover:bg-red-800 transition-colors shadow-2xl">
+                <span>了解建筑方案</span>
+                <i class="fa fa-chevron-down animate-bounce text-2xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- 核心模块区 -->
+    <section id="core-modules" class="py-32 bg-white relative overflow-hidden">
+        <!-- 背景装饰元素 -->
+        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-red-50 to-transparent"></div>
+        <div class="absolute -top-60 -right-60 w-120 h-120 bg-red-100 rounded-full opacity-30"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-100 rounded-full opacity-30"></div>
+        
+        <div class="container mx-auto px-5 relative z-10">
+            <div class="text-center mb-24">
+                <h2 class="text-[clamp(2.5rem,7vw,4rem)] font-black text-gray-800 mb-8">六大核心功能，专注神木民居建筑服务</h2>
+                <p class="text-2xl text-gray-600 max-w-2xl mx-auto font-medium">
+                    从建筑方案选型到传统工艺传承，全方位满足村民建房与文化保护需求
+                </p>
+            </div>
+
+            <!-- 优化后的模块布局：图库→匠人→建筑选型 第一排 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- 神木图库模块（第一） -->
+                <a href="gallery.html" class="card-hover card-gradient-blue rounded-3xl shadow-2xl p-10 relative group text-white overflow-hidden">
+                    <div class="module-badge">1</div>
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-white/30 transition-colors backdrop-blur-sm">
+                        <i class="fa fa-picture-o text-white text-5xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-[clamp(2rem,4vw,3rem)] font-black mb-6">神木图库</h3>
+                    <p class="text-xl md:text-2xl leading-relaxed font-medium">
+                        汇集海量神木传统民居与现代改良型建筑高清图片，按风格、户型、功能分类展示，直观参考
+                    </p>
+                    <div class="mt-8 inline-flex items-center text-white font-bold text-xl md:text-2xl group-hover:text-gray-100 transition-colors">
+                        <span>浏览图片</span>
+                        <i class="fa fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform text-2xl"></i>
+                    </div>
+                    <!-- hover渐变叠加 -->
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+
+                <!-- 匠心传承模块（第二） -->
+                <a href="craftsmen.html" class="card-hover card-gradient-teal rounded-3xl shadow-2xl p-10 relative group text-white overflow-hidden">
+                    <div class="module-badge">2</div>
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-white/30 transition-colors backdrop-blur-sm">
+                        <i class="fa fa-hand-rock-o text-white text-5xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-[clamp(2rem,4vw,3rem)] font-black mb-6">匠心传承</h3>
+                    <p class="text-xl md:text-2xl leading-relaxed font-medium">
+                        记录神木老匠人精湛建筑工艺，提供传统木工、瓦工、石雕等技术咨询，传承千年建造智慧
+                    </p>
+                    <div class="mt-8 inline-flex items-center text-white font-bold text-xl md:text-2xl group-hover:text-gray-100 transition-colors">
+                        <span>找老匠人</span>
+                        <i class="fa fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform text-2xl"></i>
+                    </div>
+                    <!-- hover渐变叠加 -->
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+
+                <!-- 建筑选型模块（第三，第一排最后一个） -->
+                <a href="building.html" class="card-hover card-gradient-indigo rounded-3xl shadow-2xl p-10 relative group text-white overflow-hidden">
+                    <div class="module-badge">3</div>
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-white/30 transition-colors backdrop-blur-sm">
+                        <i class="fa fa-building-o text-white text-5xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-[clamp(2rem,4vw,3rem)] font-black mb-6">乡韵筑造</h3>
+                    <p class="text-xl md:text-2xl leading-relaxed font-medium">
+                        提供窑洞、四合院等多种民居建筑方案，含户型图、造价估算、施工指导，满足村民建房需求
+                    </p>
+                    <div class="mt-8 inline-flex items-center text-white font-bold text-xl md:text-2xl group-hover:text-gray-100 transition-colors">
+                        <span>选建房方案</span>
+                        <i class="fa fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform text-2xl"></i>
+                    </div>
+                    <!-- hover渐变叠加 -->
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+
+                <!-- 意见征集模块 -->
+                <a href="feedback.html" class="card-hover card-gradient-orange rounded-3xl shadow-2xl p-10 relative group text-white overflow-hidden">
+                    <div class="module-badge">4</div>
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-white/30 transition-colors backdrop-blur-sm">
+                        <i class="fa fa-comments-o text-white text-5xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-[clamp(2rem,4vw,3rem)] font-black mb-6">意见征集</h3>
+                    <p class="text-xl md:text-2xl leading-relaxed font-medium">
+                        收集村民建房需求、建筑方案改进建议，优化服务内容，打造更贴合本地需求的民居建筑平台
+                    </p>
+                    <div class="mt-8 inline-flex items-center text-white font-bold text-xl md:text-2xl group-hover:text-gray-100 transition-colors">
+                        <span>提交建议</span>
+                        <i class="fa fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform text-2xl"></i>
+                    </div>
+                    <!-- hover渐变叠加 -->
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+
+                <!-- 文化故事模块 -->
+                <a href="building.html#culture" class="card-hover card-gradient-purple rounded-3xl shadow-2xl p-10 relative group text-white overflow-hidden">
+                    <div class="module-badge">5</div>
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-white/30 transition-colors backdrop-blur-sm">
+                        <i class="fa fa-book text-white text-5xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-[clamp(2rem,4vw,3rem)] font-black mb-6">建筑文化</h3>
+                    <p class="text-xl md:text-2xl leading-relaxed font-medium">
+                        讲述神木民居建筑背后的历史渊源、地域特色与文化内涵，让建房同时传承本土文化
+                    </p>
+                    <div class="mt-8 inline-flex items-center text-white font-bold text-xl md:text-2xl group-hover:text-gray-100 transition-colors">
+                        <span>了解文化</span>
+                        <i class="fa fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform text-2xl"></i>
+                    </div>
+                    <!-- hover渐变叠加 -->
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+
+                <!-- 积分商城模块 -->
+                <a href="mall.html" class="card-hover card-gradient-red rounded-3xl shadow-2xl p-10 relative group text-white overflow-hidden">
+                    <div class="module-badge">6</div>
+                    <div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-white/30 transition-colors backdrop-blur-sm">
+                        <i class="fa fa-shopping-bag text-white text-5xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-[clamp(2rem,4vw,3rem)] font-black mb-6">积分商城</h3>
+                    <p class="text-xl md:text-2xl leading-relaxed font-medium">
+                        参与平台活动、提交建房需求获取积分，兑换建筑材料优惠券、施工工具、文创产品等实用礼品
+                    </p>
+                    <div class="mt-8 inline-flex items-center text-white font-bold text-xl md:text-2xl group-hover:text-gray-100 transition-colors">
+                        <span>逛商城</span>
+                        <i class="fa fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform text-2xl"></i>
+                    </div>
+                    <!-- hover渐变叠加 -->
+                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 多角色价值区 -->
+    <section class="py-28 bg-gray-50">
+        <div class="container mx-auto px-5">
+            <h2 class="text-3xl md:text-4xl font-black text-center mb-6 text-gray-800">聚焦建房需求，服务各类用户</h2>
+            <p class="text-xl md:text-2xl text-gray-600 text-center mb-18 max-w-2xl mx-auto font-medium">
+                无论是准备建房的村民、传承工艺的匠人，还是关注文化的爱好者，都能找到专属价值
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- 村民场景（重点突出） -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border-4 border-red-300 transform md:scale-105">
+                    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-home text-red-700 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-black mb-4 text-gray-800">准备建房的村民</h3>
+                    <ul class="text-gray-600 space-y-3 text-xl font-medium">
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 浏览多种建筑方案</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 获取户型图与造价估算</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 联系老匠人施工</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 参与方案优化讨论</li>
+                    </ul>
+                </div>
+
+                <!-- 老匠人场景 -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border-4 border-teal-300">
+                    <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-hand-rock-o text-teal-700 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-black mb-4 text-gray-800">传统建筑匠人</h3>
+                    <ul class="text-gray-600 space-y-3 text-xl font-medium">
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 展示精湛工艺</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 承接建房订单</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 收徒传承技艺</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 交流技术经验</li>
+                    </ul>
+                </div>
+
+                <!-- 文化爱好者场景 -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border-4 border-purple-300">
+                    <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-book text-purple-700 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-black mb-4 text-gray-800">文化爱好者</h3>
+                    <ul class="text-gray-600 space-y-3 text-xl font-medium">
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 研究建筑风格演变</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 了解传统工艺细节</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 传播建筑文化</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 参与保护讨论</li>
+                    </ul>
+                </div>
+
+                <!-- 政府部门场景 -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border-4 border-blue-300">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-gavel text-blue-700 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-black mb-4 text-gray-800">政府相关部门</h3>
+                    <ul class="text-gray-600 space-y-3 text-xl font-medium">
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 推广标准建筑方案</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 收集民居保护建议</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 扶持传统匠人发展</li>
+                        <li><i class="fa fa-check text-green-500 mr-3"></i> 宣传本土建筑文化</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神木热门特色建筑</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入图标库 -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        /* 自定义动画效果 */
+        .card-hover {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(0);
+        }
+        .card-hover:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.25), 0 15px 15px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <!-- 热门建筑展示区 -->
+    <section class="py-28 bg-white">
+        <div class="container mx-auto px-5">
+            <!-- 标题区域 -->
+            <div class="text-center mb-20">
+                <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-6">神木热门特色建筑</h2>
+                <p class="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto font-medium">
+                    探访神木最具代表性的传统建筑，感受边塞文化的独特魅力
+                </p>
+            </div>
+
+            <!-- 建筑卡片网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- 神木窑洞 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover group">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                        <!-- 悬停渐变遮罩 -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <a href="architecture.html#cave" class="block w-full p-6 text-white text-xl font-bold">查看详情</a>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800">神木窑洞</h3>
+                        <p class="text-gray-600 mb-4">陕北特色民居，冬暖夏凉</p>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">窑洞</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">传统民居</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 高家堡古城 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover group">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                        <!-- 悬停渐变遮罩 -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <a href="architecture.html#gaojiabao" class="block w-full p-6 text-white text-xl font-bold">查看详情</a>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800">高家堡古城</h3>
+                        <p class="text-gray-600 mb-4">边塞古镇，《平凡的世界》取景地</p>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">古城</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">明清建筑</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 二郎山建筑群 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover group">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                        <!-- 悬停渐变遮罩 -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <a href="architecture.html#erlangshan" class="block w-full p-6 text-white text-xl font-bold">查看详情</a>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800">二郎山建筑群</h3>
+                        <p class="text-gray-600 mb-4">陕北道教名山，古建筑群错落有致</p>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">宗教建筑</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">山地建筑</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 神木四合院 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover group">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                        <!-- 悬停渐变遮罩 -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <a href="architecture.html#siheyuan" class="block w-full p-6 text-white text-xl font-bold">查看详情</a>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800">神木四合院</h3>
+                        <p class="text-gray-600 mb-4">传统民居，融合陕北与晋商风格</p>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">四合院</span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">晋商风格</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查看更多按钮 -->
+            <div class="text-center mt-16">
+                <a href="architecture.html" class="inline-flex items-center gap-3 bg-red-700 text-white px-12 py-5 rounded-full text-2xl font-bold hover:bg-red-800 transition-colors shadow-2xl">
+                    <span>查看更多神木建筑</span>
+                    <i class="fa fa-arrow-right text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+
+    <!-- 匠心传承展示区 -->
+    <section class="py-28 bg-gray-50">
+        <div class="container mx-auto px-5">
+            <div class="text-center mb-20">
+                <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-6">神木匠心传承</h2>
+                <p class="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto font-medium">
+                    致敬老匠人，让传统建筑工艺在新时代焕发活力
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 匠人1 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800"></h3>
+                        <p class="text-gray-600 mb-4"></p>
+                        <div class="flex gap-2 mb-4">
+                            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium"></span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"></span>
+                        </div>
+                        <a href="craftsmen.html#zhang" class="inline-flex items-center gap-2 text-teal-700 font-bold hover:text-teal-900 transition-colors">
+                            <span>联系匠人</span>
+                            <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 匠人2 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800"></h3>
+                        <p class="text-gray-600 mb-4"></p>
+                        <div class="flex gap-2 mb-4">
+                            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium"></span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"></span>
+                        </div>
+                        <a href="craftsmen.html#li" class="inline-flex items-center gap-2 text-teal-700 font-bold hover:text-teal-900 transition-colors">
+                            <span>联系匠人</span>
+                            <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 匠人3 -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover">
+                    <div class="relative">
+                        <img src="" alt="" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-black mb-2 text-gray-800"></h3>
+                        <p class="text-gray-600 mb-4"></p>
+                        <div class="flex gap-2 mb-4">
+                            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium"></span>
+                            <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"></span>
+                        </div>
+                        <a href="craftsmen.html#wang" class="inline-flex items-center gap-2 text-teal-700 font-bold hover:text-teal-900 transition-colors">
+                            <span>联系匠人</span>
+                            <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-16">
+                <a href="craftsmen.html" class="inline-flex items-center gap-3 bg-teal-700 text-white px-12 py-5 rounded-full text-2xl font-bold hover:bg-teal-800 transition-colors shadow-2xl">
+                    <span>查看更多匠人资源</span>
+                    <i class="fa fa-arrow-right text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 行动召唤区 -->
+    <section class="py-28 bg-red-700 text-white">
+        <div class="container mx-auto px-5 text-center">
+            <h2 class="text-3xl md:text-4xl font-black mb-8">准备建房？立即获取专属建筑方案！</h2>
+            <p class="text-red-100 mb-12 max-w-2xl mx-auto text-2xl font-medium">
+                浏览方案、联系匠人、咨询造价，一站式解决神木村民建房需求
+            </p>
+            <div class="flex flex-wrap justify-center gap-8">
+                <a href="building.html" class="bg-white text-red-700 px-12 py-6 rounded-full text-2xl font-black hover:bg-red-50 transition-colors shadow-2xl transform hover:scale-105 transition-transform">
+                    <i class="fa fa-building-o mr-3"></i> 查看建筑方案
+                </a>
+                <a href="craftsmen.html" class="bg-white text-red-700 px-12 py-6 rounded-full text-2xl font-black hover:bg-red-50 transition-colors shadow-2xl transform hover:scale-105 transition-transform">
+                    <i class="fa fa-hand-rock-o mr-3"></i> 联系老匠人
+                </a>
+                <a href="feedback.html" class="bg-transparent text-white px-12 py-6 rounded-full text-2xl font-black hover:bg-red-600 transition-colors shadow-2xl border-4 border-white transform hover:scale-105 transition-transform">
+                    <i class="fa fa-pencil mr-3"></i> 提交建房需求
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部信息 -->
+    <footer class="bg-gray-900 text-white py-24">
+        <div class="container mx-auto px-5">
+            <div class="flex flex-col md:flex-row justify-between gap-12">
+                <div class="w-full md:w-1/3">
+                    <div class="flex items-center gap-3 mb-8">
+                        <i class="fa fa-home text-red-400 text-4xl"></i>
+                        <span class="text-3xl font-black">神木e建通</span>
+                    </div>
+                    <p class="text-gray-400 text-xl leading-relaxed font-medium">
+                        专注神木民居建筑选型与传统工艺传承，为村民提供专业、贴心的建房服务，让每一栋民居都承载文化记忆。
+                    </p>
+                </div>
+
+                <div class="w-full md:w-2/3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                    <div>
+                        <h4 class="text-2xl font-black mb-7">快速导航</h4>
+                        <ul class="space-y-4 text-gray-400 text-xl font-medium">
+                            <li><a href="index.html" class="hover:text-white transition-colors">首页</a></li>
+                            <li><a href="gallery.html" class="hover:text-white transition-colors">神木图库</a></li>
+                            <li><a href="craftsmen.html" class="hover:text-white transition-colors">匠心传承</a></li>
+                            <li><a href="building.html" class="hover:text-white transition-colors">乡韵筑造</a></li>
+                            <li><a href="feedback.html" class="hover:text-white transition-colors">意见征集</a></li>
+                            <li><a href="mall.html" class="hover:text-white transition-colors">积分商城</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-2xl font-black mb-7">建房服务</h4>
+                        <ul class="space-y-4 text-gray-400 text-xl font-medium">
+                            <li><a href="building.html#cave" class="hover:text-white transition-colors">窑洞方案</a></li>
+                            <li><a href="building.html#siheyuan" class="hover:text-white transition-colors">四合院方案</a></li>
+                            <li><a href="building.html#mountain" class="hover:text-white transition-colors">山地民居方案</a></li>
+                            <li><a href="craftsmen.html" class="hover:text-white transition-colors">匠人资源</a></li>
+                            <li><a href="building.html#cost" class="hover:text-white transition-colors">造价估算</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-2xl font-black mb-7">联系方式</h4>
+                        <ul class="space-y-4 text-gray-400 text-xl font-medium">
+                            <li><i class="fa fa-phone mr-3"></i> 建房咨询：0912-1234567</li>
+                            <li><i class="fa fa-envelope-o mr-3"></i> 邮箱：service@shenmujiantong.com</li>
+                            <li><i class="fa fa-map-marker mr-3"></i> 地址：陕西省神木市建筑服务中心</li>
+                            <li><i class="fa fa-weixin mr-3"></i> 微信公众号：神木e建通</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-2xl font-black mb-7">关注我们</h4>
+                        <div class="flex gap-6 mb-7">
+                            <a href="#" class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fa fa-weixin text-white text-3xl"></i>
+                            </a>
+                            <a href="#" class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fa fa-weibo text-white text-3xl"></i>
+                            </a>
+                        </div>
+                        <p class="text-gray-400 text-xl font-medium">扫码关注，获取最新建房优惠</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-16 pt-12 text-center text-gray-500 text-xl font-medium">
+                <p>© 2025 神木e建通 版权所有 | 备案号：陕ICP备XXXXXXXX号 | 神木市民居建筑服务平台</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录模态框（默认隐藏） -->
+    <div id="loginModal" class="fixed inset-0 bg-black/60 z-50 hidden modal-fade items-center justify-center p-5">
+        <div class="bg-white rounded-3xl shadow-3xl w-full max-w-md modal-slide overflow-hidden transform hover:scale-[1.01] transition-transform">
+            <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-3xl font-black text-gray-800">用户登录</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-3xl">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="loginForm" class="p-8 space-y-6">
+                <!-- 角色选择 -->
+                <div class="space-y-4">
+                    <label class="block text-lg font-bold text-gray-700 text-2xl">你是哪种用户？</label>
+                    <div class="grid grid-cols-2 gap-5">
+                        <label class="flex items-center p-5 border-3 border-gray-200 rounded-xl cursor-pointer hover:border-red-500 transition-colors text-2xl font-medium">
+                            <input type="radio" name="userRole" value="resident" class="mr-4 text-red-600 w-6 h-6" checked>
+                            <span>村民（建房）</span>
+                        </label>
+                        <label class="flex items-center p-5 border-3 border-gray-200 rounded-xl cursor-pointer hover:border-red-500 transition-colors text-2xl font-medium">
+                            <input type="radio" name="userRole" value="craftsman" class="mr-4 text-red-600 w-6 h-6">
+                            <span>建筑匠人</span>
+                        </label>
+                        <label class="flex items-center p-5 border-3 border-gray-200 rounded-xl cursor-pointer hover:border-red-500 transition-colors text-2xl font-medium">
+                            <input type="radio" name="userRole" value="enthusiast" class="mr-4 text-red-600 w-6 h-6">
+                            <span>文化爱好者</span>
+                        </label>
+                        <label class="flex items-center p-5 border-3 border-gray-200 rounded-xl cursor-pointer hover:border-red-500 transition-colors text-2xl font-medium">
+                            <input type="radio" name="userRole" value="government" class="mr-4 text-red-600 w-6 h-6">
+                            <span>政府部门</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 账号输入 -->
+                <div class="space-y-4">
+                    <label for="username" class="block text-lg font-bold text-gray-700 text-2xl">账号</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-3xl">
+                            <i class="fa fa-user-o"></i>
+                        </span>
+                        <input type="text" id="username" name="username" required
+                            class="w-full pl-16 pr-6 py-5 border-3 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-500 focus:border-red-500 outline-none transition-colors text-2xl">
+                    </div>
+                </div>
+
+                <!-- 密码输入 -->
+                <div class="space-y-4">
+                    <label for="password" class="block text-lg font-bold text-gray-700 text-2xl">密码</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-3xl">
+                            <i class="fa fa-lock"></i>
+                        </span>
+                        <input type="password" id="password" name="password" required
+                            class="w-full pl-16 pr-16 py-5 border-3 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-500 focus:border-red-500 outline-none transition-colors text-2xl">
+                        <button type="button" id="togglePwdBtn" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-3xl">
+                            <i class="fa fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 记住密码 + 忘记密码 -->
+                <div class="flex justify-between items-center">
+                    <label class="flex items-center text-lg text-gray-600 cursor-pointer text-2xl font-medium">
+                        <input type="checkbox" name="remember" class="mr-4 text-red-600 w-6 h-6">
+                        <span>记住我的账号</span>
+                    </label>
+                    <a href="#" class="text-lg text-red-600 hover:text-red-800 transition-colors text-2xl font-medium">忘记密码了？</a>
+                </div>
+
+                <!-- 登录按钮 -->
+                <button type="submit" class="w-full bg-red-700 text-white py-6 rounded-xl font-black hover:bg-red-800 transition-colors flex items-center justify-center gap-3 text-3xl transform hover:scale-[1.02] transition-transform">
+                    <i class="fa fa-sign-in"></i>
+                    <span>登录</span>
+                </button>
+
+                <!-- 游客快速登录 -->
+                <div class="text-center text-lg text-gray-600 mt-4 text-2xl font-medium">
+                    <span>不想注册？</span>
+                    <button type="button" id="touristQuickLogin" class="text-red-600 hover:text-red-800 transition-colors font-bold">游客快速浏览</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 消息提示框（默认隐藏） -->
+    <div id="toast" class="fixed top-24 right-5 z-50 px-8 py-5 rounded-2xl shadow-2xl hidden flex items-center gap-4 text-2xl font-bold" style="min-width: 250px;">
+        <i class="fa fa-check-circle text-3xl"></i>
+        <span id="toastMsg">操作成功</span>
+    </div>
+
+    <!-- JS交互 -->
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('header');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+                nav.classList.remove('bg-white/95');
+                nav.classList.add('bg-white');
+            } else {
+                nav.classList.remove('shadow-lg');
+                nav.classList.add('bg-white/95');
+                nav.classList.remove('bg-white');
+            }
+        });
+
+        // 移动端汉堡菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        menuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                menuBtn.innerHTML = '<i class="fa fa-bars"></i>';
+            } else {
+                menuBtn.innerHTML = '<i class="fa fa-times"></i>';
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId !== '#') {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 120,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
+        // 登录功能核心逻辑
+        const loginModal = document.getElementById('loginModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const loginForm = document.getElementById('loginForm');
+        const togglePwdBtn = document.getElementById('togglePwdBtn');
+        const passwordInput = document.getElementById('password');
+        const touristQuickLogin = document.getElementById('touristQuickLogin');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const mobileUserInfo = document.getElementById('mobileUserInfo');
+        const mobileUserName = document.getElementById('mobileUserName');
+        const mobileUserRole = document.getElementById('mobileUserRole');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        // 角色名称映射
+        const roleMap = {
+            'resident': '村民',
+            'craftsman': '建筑匠人',
+            'enthusiast': '文化爱好者',
+            'government': '政府部门'
+        };
+
+        // 打开登录模态框
+        function openLoginModal() {
+            loginModal.classList.remove('hidden');
+            loginModal.classList.add('flex');
+            // 禁止背景滚动
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭登录模态框
+        function closeLoginModal() {
+            loginModal.classList.add('hidden');
+            loginModal.classList.remove('flex');
+            // 恢复背景滚动
+            document.body.style.overflow = '';
+        }
+
+        // 显示消息提示
+        function showToast(message, isSuccess = true) {
+            toastMsg.textContent = message;
+            const icon = toast.querySelector('i');
+            if (isSuccess) {
+                toast.className = 'fixed top-24 right-5 z-50 px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-4 bg-green-500 text-white text-2xl font-bold';
+                icon.className = 'fa fa-check-circle text-3xl';
+            } else {
+                toast.className = 'fixed top-24 right-5 z-50 px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-4 bg-red-500 text-white text-2xl font-bold';
+                icon.className = 'fa fa-exclamation-circle text-3xl';
+            }
+            toast.classList.remove('hidden');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 保存登录状态
+        function saveLoginState(userData) {
+            localStorage.setItem('isLogin', 'true');
+            localStorage.setItem('userName', userData.name);
+            localStorage.setItem('userRole', userData.role);
+            updateUserInfoDisplay();
+        }
+
+        // 清除登录状态
+        function clearLoginState() {
+            localStorage.removeItem('isLogin');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            updateUserInfoDisplay();
+        }
+
+        // 更新用户信息显示
+        function updateUserInfoDisplay() {
+            const isLogin = localStorage.getItem('isLogin') === 'true';
+            const userNameVal = localStorage.getItem('userName') || '未知用户';
+            const userRoleVal = localStorage.getItem('userRole') || 'resident';
+            const userRoleName = roleMap[userRoleVal];
+
+            if (isLogin) {
+                // 已登录状态
+                loginBtn.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                userName.textContent = userNameVal;
+                
+                mobileUserInfo.classList.remove('hidden');
+                mobileUserName.textContent = userNameVal;
+                mobileUserRole.textContent = userRoleName;
+            } else {
+                // 未登录状态
+                loginBtn.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                
+                mobileUserInfo.classList.add('hidden');
+            }
+        }
+
+        // 密码显示/隐藏切换
+        togglePwdBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // 切换图标
+            if (type === 'text') {
+                togglePwdBtn.innerHTML = '<i class="fa fa-eye"></i>';
+            } else {
+                togglePwdBtn.innerHTML = '<i class="fa fa-eye-slash"></i>';
+            }
+        });
+
+        // 游客快速登录
+        touristQuickLogin.addEventListener('click', function() {
+            const randomNum = Math.floor(Math.random() * 10000);
+            const userData = {
+                name: `游客${randomNum}`,
+                role: 'resident'
+            };
+            saveLoginState(userData);
+            closeLoginModal();
+            showToast('游客快速登录成功！');
+        });
+
+        // 登录表单提交
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = passwordInput.value.trim();
+            const selectedRole = document.querySelector('input[name="userRole"]:checked').value;
+            const remember = document.querySelector('input[name="remember"]').checked;
+
+            // 简单表单验证
+            if (!username || !password) {
+                showToast('账号和密码不能为空哦', false);
+                return;
+            }
+
+            // 模拟登录请求
+            setTimeout(() => {
+                // 模拟登录成功
+                const userData = {
+                    name: username,
+                    role: selectedRole
+                };
+                saveLoginState(userData);
+                closeLoginModal();
+                showToast(`欢迎${roleMap[selectedRole]}${username}，登录成功！`);
+
+                // 如果不勾选记住密码，1小时后自动退出
+                if (!remember) {
+                    setTimeout(() => {
+                        if (localStorage.getItem('isLogin') === 'true') {
+                            clearLoginState();
+                            showToast('登录超时啦，请重新登录', false);
+                        }
+                    }, 3600000); // 1小时 = 3600000毫秒
+                }
+
+                // 重置表单
+                loginForm.reset();
+            }, 800);
+        });
+
+        // 退出登录
+        function logout() {
+            clearLoginState();
+            showToast('退出登录成功！');
+        }
+
+        // 绑定事件
+        loginBtn.addEventListener('click', openLoginModal);
+        mobileLoginBtn.addEventListener('click', openLoginModal);
+        closeModalBtn.addEventListener('click', closeLoginModal);
+        logoutBtn.addEventListener('click', logout);
+        mobileLogoutBtn.addEventListener('click', logout);
+
+        // 点击模态框背景关闭
+        loginModal.addEventListener('click', function(e) {
+            if (e.target === loginModal) {
+                closeLoginModal();
+            }
+        });
+
+        // 初始化页面时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserInfoDisplay();
+        });
+    </script>
+</body>
+</html>
